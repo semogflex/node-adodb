@@ -1,83 +1,98 @@
 # node-adodb
 
->一个用 Node.js 实现的 ADODB 协议。
+>一个用 Node.js 实现的 windows 上的 ADODB 协议。
 >
 >[![NPM Version][npm-image]][npm-url]
 >[![Download Status][download-image]][npm-url]
 >[![Windows Status][appveyor-image]][appveyor-url]
 >[![Test Coverage][coveralls-image]][coveralls-url]
+>![Node Version][node-image]
 >[![Dependencies][david-image]][david-url]
 
 ### 安装
-```
-$ npm install node-adodb
-```
+[![NPM](https://nodei.co/npm/node-adodb.png)](https://nodei.co/npm/node-adodb/)
 
 ### 使用示例:
 ```js
-var ADODB = require('node-adodb');
-var connection = ADODB.open('Provider=Microsoft.Jet.OLEDB.4.0;Data Source=node-adodb.mdb;');
+'use strict';
 
-// 全局调试开关，默认关闭
-process.env.DEBUG = 'ADODB';
+const ADODB = require('node-adodb');
+const connection = ADODB.open('Provider=Microsoft.Jet.OLEDB.4.0;Data Source=node-adodb.mdb;');
 
-// 不带返回的查询
+// 不带返回的执行
 connection
   .execute('INSERT INTO Users(UserName, UserSex, UserAge) VALUES ("Newton", "Male", 25)')
-  .on('done', function(data) {
-    console.log('result:', JSON.stringify(data, null, '  '));
+  .then(data => {
+    console.log(JSON.stringify(data, null, 2));
   })
-  .on('fail', function(error) {
+  .catch(error => {
     // TODO 逻辑处理
   });
 
-// 带返回标识的查询
+// 带返回标识的执行
 connection
   .execute(
     'INSERT INTO Users(UserName, UserSex, UserAge) VALUES ("Newton", "Male", 25)',
     'SELECT @@Identity AS id'
   )
-  .on('done', function(data) {
-    console.log('result:', JSON.stringify(data, null, '  '));
+  .then(data => {
+    console.log(JSON.stringify(data, null, 2));
   })
-  .on('fail', function(error) {
+  .catch(error => {
     // TODO 逻辑处理
   });
 
 // 带返回的查询
 connection
   .query('SELECT * FROM Users')
-  .on('done', function(data) {
-    console.log('result:', JSON.stringify(data, null, '  '));
+  .then(data => {
+    console.log(JSON.stringify(data, null, 2));
   })
-  .on('fail', function(error) {
+  .catch(error => {
+    // TODO 逻辑处理
+  });
+
+// 带字段描述的查询
+connection
+  .schema(20)
+  .then(schema => {
+    console.log(JSON.stringify(schema, null, 2));
+  })
+  .catch(error => {
     // TODO 逻辑处理
   });
 ```
 
 ### 接口文档:
-`ADODB.open(connection)`
+`ADODB.open(connection): ADODB`
 >初始化数据库链接参数。
 
-`ADODB.query(sql)`
+`ADODB.query(sql): Promise`
 >执行有返回值的SQL语句。
 
-`ADODB.execute(sql, [scalar])`
+`ADODB.execute(sql[, scalar]): Promise`
 >执行无返回值或者带更新统计的的SQL语句。
 
+`ADODB.schema(type[, criteria][, id]): Promise`
+>查询数据库架构信息。参考： [OpenSchema](https://docs.microsoft.com/zh-cn/sql/ado/reference/ado-api/openschema-method)
+
+### 调试：
+>设置环境变量 ```DEBUG=ADODB```。参考： [debug](https://github.com/visionmedia/debug)
+
 ### 扩展:
->该插件理论支持 Windows 平台下所有支持 ADODB 连接的数据库，只需要更改数据库连接字符串即可实现操作！
+>该类库理论支持 Windows 平台下所有支持 ADODB 连接的数据库，只需要更改数据库连接字符串即可实现操作！
 
 ### 注意:
->该插件需要系统支持 Microsoft.Jet.OLEDB.4.0，对于 Windows XP SP2 以上系统默认支持，其它需要自己升级，具体操作过程请参考：
+>该类库需要系统支持 Microsoft.Jet.OLEDB.4.0，对于 Windows XP SP2 以上系统默认支持，其它需要自己升级，具体操作过程请参考：
 [如何获取 Microsoft Jet 4.0 数据库引擎的最新 Service Pack](http://support.microsoft.com/default.aspx?scid=kb;zh-CN;239114)
 
 [npm-image]: https://img.shields.io/npm/v/node-adodb.svg?style=flat-square
 [npm-url]: https://www.npmjs.org/package/node-adodb
 [download-image]: https://img.shields.io/npm/dm/node-adodb.svg?style=flat-square
-[appveyor-image]: https://img.shields.io/appveyor/ci/nuintun/node-adodb.svg?style=flat-square&label=windows
+[appveyor-image]: https://img.shields.io/appveyor/ci/nuintun/node-adodb/master.svg?style=flat-square&label=windows
 [appveyor-url]: https://ci.appveyor.com/project/nuintun/node-adodb
 [coveralls-image]: http://img.shields.io/coveralls/nuintun/node-adodb/master.svg?style=flat-square
 [coveralls-url]: https://coveralls.io/r/nuintun/node-adodb?branch=master
-[david-image]: https://img.shields.io/david/nuintun/node-adodb.svg?style=flat-square
+[david-image]: https://img.shields.io/david/nuintun/node-adodb/master.svg?style=flat-square
 [david-url]: https://david-dm.org/nuintun/node-adodb
+[node-image]: https://img.shields.io/node/v/node-adodb.svg?style=flat-square
