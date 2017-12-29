@@ -2,7 +2,7 @@ title: Node-adodb
 description: A Node.js JavaScript Client implementing the ADODB protocol.
 google_analytics: 
 show_downloads: true
-theme: jekyll-theme-merlot
+theme: jekyll-theme-architect
 
 gems:
   - jekyll-mentions
